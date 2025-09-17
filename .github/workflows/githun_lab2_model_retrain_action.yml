@@ -1,0 +1,147 @@
+name: Model Retraining on Push to Main
+
+on:
+  push:
+    paths:
+      - 'labs/github-labs/lab-2/**'  # Only trigger for lab-2 changes
+    branches:
+      - main
+
+jobs:
+  retrain:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.12
+
+    - name: Install dependencies
+      run: |
+        cd labs/github-labs/lab-2
+        pip install -r requirements.txt
+
+    - name: Create necessary directories
+      run: |
+        cd labs/github-labs/lab-2
+        mkdir -p models
+        mkdir -p metrics
+        echo "Created directories in lab-2:"
+        ls -la
+
+    - name: Generate and Store Timestamp
+      run: |
+        timestamp=$(date '+%Y%m%d_%H%M%S')
+        echo "Generated timestamp: $timestamp"
+        echo "TIMESTAMP=$timestamp" >> $GITHUB_ENV
+        
+        # Create the filenames we'll use
+        model_filename="model_${timestamp}_dt_model.joblib"
+        metrics_filename="${timestamp}_metrics.json"
+        
+        echo "MODEL_FILENAME=$model_filename" >> $GITHUB_ENV
+        echo "METRICS_FILENAME=$metrics_filename" >> $GITHUB_ENV
+        
+        echo "Environment variables set:"
+        echo "- TIMESTAMP=$timestamp"
+        echo "- MODEL_FILENAME=$model_filename"
+        echo "- METRICS_FILENAME=$metrics_filename"
+
+    - name: Check File Permissions
+      run: |
+        cd labs/github-labs/lab-2
+        echo "Checking file permissions:"
+        ls -l ./src/train_model.py
+        ls -l ./src/evaluate_model.py
+
+    - name: Set File Permissions
+      run: |
+        cd labs/github-labs/lab-2
+        chmod +x ./src/train_model.py
+        chmod +x ./src/evaluate_model.py
+        echo "Made files executable"
+
+    - name: Train Model
+      run: |
+        cd labs/github-labs/lab-2
+        echo "Starting model training with timestamp: $TIMESTAMP"
+        python ./src/train_model.py --timestamp "$TIMESTAMP"
+        
+        # Verify model was created
+        if [ -f "$MODEL_FILENAME" ]; then
+          echo "✅ Model file created: $MODEL_FILENAME"
+          ls -la "$MODEL_FILENAME"
+        else
+          echo "❌ Model file not found: $MODEL_FILENAME"
+          echo "Files in current directory:"
+          ls -la
+          exit 1
+        fi
+
+    - name: Evaluate Model and Log Metrics
+      run: |
+        cd labs/github-labs/lab-2
+        echo "Starting model evaluation with timestamp: $TIMESTAMP"
+        python ./src/evaluate_model.py --timestamp "$TIMESTAMP"
+        
+        # Verify metrics were created
+        if [ -f "$METRICS_FILENAME" ]; then
+          echo "✅ Metrics file created: $METRICS_FILENAME"
+          ls -la "$METRICS_FILENAME"
+        else
+          echo "❌ Metrics file not found: $METRICS_FILENAME"
+          echo "Files in current directory:"
+          ls -la
+          exit 1
+        fi
+      continue-on-error: false
+
+    - name: Store and Version Files
+      run: |
+        cd labs/github-labs/lab-2
+        echo "Moving files to final locations..."
+        
+        # Move model to models directory
+        if [ -f "$MODEL_FILENAME" ]; then
+          mv "$MODEL_FILENAME" "./models/"
+          echo "✅ Moved model to ./models/$MODEL_FILENAME"
+        fi
+        
+        # Move metrics to metrics directory
+        if [ -f "$METRICS_FILENAME" ]; then
+          mv "$METRICS_FILENAME" "./metrics/"
+          echo "✅ Moved metrics to ./metrics/$METRICS_FILENAME"
+        fi
+        
+        # Verify files are in correct locations
+        echo "Files in models directory:"
+        ls -la ./models/
+        echo "Files in metrics directory:"
+        ls -la ./metrics/
+
+    - name: Commit and Push Changes
+      run: |
+        # Configure Git with dynamic user info
+        git config --global user.email "${{ github.actor }}@users.noreply.github.com"
+        git config --global user.name "${{ github.actor }}"
+        
+        # Add the specific files from lab-2
+        git add "labs/github-labs/lab-2/models/$MODEL_FILENAME" "labs/github-labs/lab-2/metrics/$METRICS_FILENAME"
+        
+        # Check if there are changes to commit
+        if git diff --staged --quiet; then
+          echo "No changes to commit"
+        else
+          echo "Committing changes..."
+          git commit -m "Lab-2 model update: $TIMESTAMP"
+          git push
+          echo "✅ Changes pushed successfully"
+        fi
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

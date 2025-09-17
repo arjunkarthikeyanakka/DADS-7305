@@ -1,6 +1,8 @@
 name: Testing Github Lab1 with Pytest
 on:
   push:
+    paths:
+      - 'labs/github-labs/lab-1/**'
     branches:
       - main
 
