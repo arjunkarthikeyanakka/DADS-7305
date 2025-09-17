@@ -179,7 +179,7 @@ cython_debug/
 #.idea/
 .DS_Store
 
-# === MLOps Lab Exceptions ===
+# === Github Lab Exceptions ===
 # Allow important lab files to be committed
 !labs/**/models/*.joblib
 !labs/**/models/*.pkl
