@@ -28,3 +28,18 @@ def test_fun4():
     
     assert calculator.fun4 (-1, -1, 100) == 98
     
+def test_fun5():
+    assert calculator.fun5(10, 2) == 5
+    assert calculator.fun5(7, 2) == 3.5
+    assert calculator.fun5(-9, 3) == -3
+
+    assert calculator.fun5(5.5, 2) == 2.75
+
+    with pytest.raises(ValueError, match="Division by zero is not allowed."):
+        calculator.fun5(5, 0)
+
+    with pytest.raises(ValueError, match="Both inputs must be numbers."):
+        calculator.fun5("a", 2)
+
+    with pytest.raises(ValueError, match="Both inputs must be numbers."):
+        calculator.fun5(10, "b")
