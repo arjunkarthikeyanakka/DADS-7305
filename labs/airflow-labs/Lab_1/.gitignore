@@ -1,0 +1,27 @@
+# Airflow runtime files
+logs/
+plugins/
+model/
+__pycache__/
+*.pyc
+*.pyo
+
+# Environment and secrets
+.env
+.env.local
+
+# Docker volumes
+postgres-db-volume/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# But KEEP docker-compose.yaml
+!docker-compose.yaml
