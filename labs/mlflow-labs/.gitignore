@@ -1,0 +1,12 @@
+# MLflow
+mlruns/
+mlartifacts/
+
+# Virtual Environment
+mlflow-env/
+
+# Generated plots
+*.png
+*.jpg
+*.jpeg
+plots/
