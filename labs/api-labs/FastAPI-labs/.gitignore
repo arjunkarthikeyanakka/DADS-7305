@@ -1,0 +1,13 @@
+# --- Mypy / Type Checking ---
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+__pycache__/
+
+# Virtual Environment
+fastapi_lab1_env/
+
+# pickle fiels
+model/
+*.pkl
