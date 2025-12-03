@@ -4,10 +4,10 @@ on:
   push:
     paths:
       - 'labs/github-labs/lab-3/**'  # Only trigger for lab-2 changes
-    branches:
-      - main
-  schedule:
-    - cron: '0 0 * * *' # Run every day at midnight
+  #   branches:
+  #     - main
+  # schedule:
+  #   - cron: '0 0 * * *' # Run every day at midnight
   workflow_dispatch: # Allow manual trigger of the workflow
 
 jobs:

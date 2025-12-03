@@ -2,11 +2,10 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [ main]
-  pull_request: 
-    branches: [ main ]
-  schedule:
-    - cron: '0 0 * * *' # Runs every day at midnight
+    paths:
+      - 'labs/github-labs/lab-4/**'  # Only trigger for lab-4 changes
+  # schedule:
+  #   - cron: '0 0 * * *' # Runs every day at midnight
   workflow_dispatch: 
 
 env:

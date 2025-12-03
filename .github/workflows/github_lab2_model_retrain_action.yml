@@ -4,8 +4,8 @@ on:
   push:
     paths:
       - 'labs/github-labs/lab-2/**'  # Only trigger for lab-2 changes
-    branches:
-      - main
+    # branches:
+    #   - main
 
 jobs:
   retrain:

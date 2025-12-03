@@ -3,8 +3,8 @@ on:
   push:
     paths:
       - 'labs/github-labs/lab-1/**'
-    branches:
-      - main
+    # branches:
+    #   - main
 
 jobs:
   build:
